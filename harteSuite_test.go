@@ -1,4 +1,4 @@
-package core6502
+package iz6502
 
 /*
 	Tests from https://github.com/TomHarte/ProcessorTests

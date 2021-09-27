@@ -1,4 +1,4 @@
-package core6502
+package iz6502
 
 func buildOpTransfer(regSrc int, regDst int) opFunc {
 	return func(s *State, line []uint8, opcode opcode) {

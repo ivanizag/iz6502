@@ -1,4 +1,4 @@
-package core6502
+package iz6502
 
 /*
 For the diffrences with NMOS6502 see:

@@ -1,4 +1,4 @@
-package core6502
+package iz6502
 
 // NewNMOS6502 returns an initialized NMOS6502
 func NewNMOS6502(m Memory) *State {
