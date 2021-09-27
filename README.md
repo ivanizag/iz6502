@@ -1,4 +1,5 @@
 # iz6502 - 6502 and 65c02 emulator in Go
+[![Go Reference](https://pkg.go.dev/badge/github.com/ivanizag/iz6502.svg)](https://pkg.go.dev/github.com/ivanizag/iz6502)
 
 6502 and 65c02 emulator library for Go. 
 
@@ -6,6 +7,8 @@ It is being used in:
 
 - Apple II emulator [izapple2](https://github.com/izapple2)
 - Acorn MOS execution environment [bbz](https://github.com/bbz)
+
+See the library documentation in [pkg.go.dev](https://pkg.go.dev/github.com/ivanizag/iz6502#section-documentation)
 
 ## Example
 
