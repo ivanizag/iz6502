@@ -190,6 +190,8 @@ func lineString(line []uint8, opcode opcode) string {
 		t += fmt.Sprintf(" $%04x,X", getWordInLine(line))
 	case modeAbsoluteY:
 		t += fmt.Sprintf(" $%04x,Y", getWordInLine(line))
+	case modeIndirect65c02Fix:
+		fallthrough
 	case modeIndirect:
 		t += fmt.Sprintf(" ($%04x)", getWordInLine(line))
 	case modeIndexedIndirectX:
