@@ -7,6 +7,7 @@ It is being used in:
 
 - Apple II emulator [izapple2](https://github.com/ivanizag/izapple2)
 - Acorn MOS execution environment [bbz](https://github.com/ivanizag/bbz)
+- Example ehBasic interpreter [ehBasic](examples/ehBasic)
 
 See the library documentation in [pkg.go.dev](https://pkg.go.dev/github.com/ivanizag/iz6502#section-documentation)
 
