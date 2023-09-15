@@ -1,2 +1,5 @@
 .vscode
 examples/simplest/simplest
+.scannerwork/
+coverage.out
+test.out
