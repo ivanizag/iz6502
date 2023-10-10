@@ -20,9 +20,10 @@ type State struct {
 	opcodes *[256]opcode
 	trace   bool
 
-	reg    registers
-	mem    Memory
-	cycles uint64
+	reg        registers
+	mem        Memory
+	cycles     uint64
+	nmiPending bool
 
 	extraCycleCrossingBoundaries bool
 	extraCycleBranchTaken        bool
@@ -58,6 +59,15 @@ func (s *State) executeLine(line []uint8) {
 
 // ExecuteInstruction transforms the state given after a single instruction is executed.
 func (s *State) ExecuteInstruction() {
+	if s.nmiPending {
+		pushWord(s, s.reg.getPC())
+		pushByte(s, s.reg.getP())
+		s.reg.setFlag(flagI)
+		s.reg.setPC(getWord(s.mem, vectorNMI))
+		s.cycles += 7
+		s.nmiPending = false
+	}
+
 	pc := s.reg.getPC()
 	opcodeID := s.mem.PeekCode(pc)
 	opcode := s.opcodes[opcodeID]
@@ -99,6 +109,11 @@ func (s *State) ExecuteInstruction() {
 	if s.trace {
 		fmt.Printf("%v, [%02x]\n", s.reg, s.lineCache[0:opcode.bytes])
 	}
+}
+
+// RaiseNMI raises a non-maskable interrupt
+func (s *State) RaiseNMI() {
+	s.nmiPending = true
 }
 
 // Reset resets the processor. Moves the program counter to the vector in 0cfffc.
