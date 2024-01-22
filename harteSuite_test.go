@@ -22,7 +22,7 @@ import (
 	"testing"
 )
 
-var ProcessorTestsEnable = true
+var ProcessorTestsEnable = false
 var ProcessorTestsPath = "/home/casa/code/ProcessorTests/"
 
 type scenarioState struct {
