@@ -344,3 +344,45 @@ func opBRKAlt(s *State, line []uint8, opcode opcode) {
 func opSTZ(s *State, line []uint8, opcode opcode) {
 	resolveSetValue(s, line, opcode, 0)
 }
+
+func buildCombined(op1 opFunc, op2 opFunc, extraCycles bool) opFunc {
+	// Some NMOS undocumented opcodes are combinations of two opcodes.
+	// In most cases there is no extra cycle when crossing page boundaries.
+	return func(s *State, line []uint8, opcode opcode) {
+		op1(s, line, opcode)
+		op2(s, line, opcode)
+		if !extraCycles {
+			s.extraCycleCrossingBoundaries = false
+		}
+	}
+}
+
+var opDCP = buildCombined(
+	buildOpIncDec(false), // DEC
+	buildOpCompare(regA), // CMP
+	false)
+
+var opISC = buildCombined(
+	buildOpIncDec(true), // INC
+	opSBC,               // SBC
+	false)
+
+var opLAX = buildCombined(
+	buildOpLoad(regA), // LDA
+	buildOpLoad(regX), // LDX
+	true)
+
+var opRLA = buildCombined(
+	buildOpShift(true, true),   // ROL
+	buildOpLogic(operationAnd), // AND
+	false)
+
+var opSLO = buildCombined(
+	buildOpShift(true, false), // ASL
+	buildOpLogic(operationOr), // ORA
+	false)
+
+var opSRE = buildCombined(
+	buildOpShift(false, false), // LSR
+	buildOpLogic(operationXor), // EOR
+	false)

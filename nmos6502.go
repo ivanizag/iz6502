@@ -186,6 +186,7 @@ var opcodesNMOS6502 = [256]opcode{
 		Undocumented opcodes,
 			see http://bbc.nvg.org/doc/6502OpList.txt
 			see https://www.nesdev.com/undocumented_opcodes.txt
+			see https://www.masswerk.at/nowgobang/2021/6502-illegal-opcodes
 	*/
 	0x1A: {"NOP", 1, 2, modeImplicit, opNOP},
 	0x3A: {"NOP", 1, 2, modeImplicit, opNOP},
@@ -229,4 +230,55 @@ var opcodesNMOS6502 = [256]opcode{
 	0xB2: {"KIL", 1, 3, modeImplicit, opHALT},
 	0xD2: {"KIL", 1, 3, modeImplicit, opHALT},
 	0xF2: {"KIL", 1, 3, modeImplicit, opHALT},
+
+	0xC7: {"DCP", 2, 5, modeZeroPage, opDCP},
+	0xD7: {"DCP", 2, 6, modeZeroPageX, opDCP},
+	0xCF: {"DCP", 3, 6, modeAbsolute, opDCP},
+	0xDF: {"DCP", 3, 7, modeAbsoluteX, opDCP},
+	0xDB: {"DCP", 3, 7, modeAbsoluteY, opDCP},
+	0xC3: {"DCP", 2, 8, modeIndexedIndirectX, opDCP},
+	0xD3: {"DCP", 2, 8, modeIndirectIndexedY, opDCP},
+
+	0xE7: {"ISC", 2, 5, modeZeroPage, opISC},
+	0xF7: {"ISC", 2, 6, modeZeroPageX, opISC},
+	0xEF: {"ISC", 3, 6, modeAbsolute, opISC},
+	0xFF: {"ISC", 3, 7, modeAbsoluteX, opISC},
+	0xFB: {"ISC", 3, 7, modeAbsoluteY, opISC},
+	0xE3: {"ISC", 2, 8, modeIndexedIndirectX, opISC},
+	0xF3: {"ISC", 2, 8, modeIndirectIndexedY, opISC},
+
+	0xA7: {"LAX", 2, 3, modeZeroPage, opLAX},
+	0xB7: {"LAX", 2, 4, modeZeroPageY, opLAX},
+	0xAF: {"LAX", 3, 4, modeAbsolute, opLAX},
+	0xBF: {"LAX", 3, 4, modeAbsoluteY, opLAX},
+	0xA3: {"LAX", 2, 6, modeIndexedIndirectX, opLAX},
+	0xB3: {"LAX", 2, 5, modeIndirectIndexedY, opLAX},
+
+	0x27: {"RLA", 2, 5, modeZeroPage, opRLA},
+	0x37: {"RLA", 2, 6, modeZeroPageX, opRLA},
+	0x2F: {"RLA", 3, 6, modeAbsolute, opRLA},
+	0x3F: {"RLA", 3, 7, modeAbsoluteX, opRLA},
+	0x3B: {"RLA", 3, 7, modeAbsoluteY, opRLA},
+	0x23: {"RLA", 2, 8, modeIndexedIndirectX, opRLA},
+	0x33: {"RLA", 2, 8, modeIndirectIndexedY, opRLA},
+
+	0x07: {"SLO", 2, 5, modeZeroPage, opSLO},
+	0x17: {"SLO", 2, 6, modeZeroPageX, opSLO},
+	0x0F: {"SLO", 3, 6, modeAbsolute, opSLO},
+	0x1F: {"SLO", 3, 7, modeAbsoluteX, opSLO},
+	0x1B: {"SLO", 3, 7, modeAbsoluteY, opSLO},
+	0x03: {"SLO", 2, 8, modeIndexedIndirectX, opSLO},
+	0x13: {"SLO", 2, 8, modeIndirectIndexedY, opSLO},
+
+	0x47: {"SRE", 2, 5, modeZeroPage, opSRE},
+	0x57: {"SRE", 2, 6, modeZeroPageX, opSRE},
+	0x4F: {"SRE", 3, 6, modeAbsolute, opSRE},
+	0x5F: {"SRE", 3, 7, modeAbsoluteX, opSRE},
+	0x5B: {"SRE", 3, 7, modeAbsoluteY, opSRE},
+	0x43: {"SRE", 2, 8, modeIndexedIndirectX, opSRE},
+	0x53: {"SRE", 2, 8, modeIndirectIndexedY, opSRE},
+
+	// Missing the ALR, ANC, ANE, ARR, LAS, LXA, SAX, SBX,
+	// SHA, SHX, SHY, TAS and USBC opcodes
+
 }

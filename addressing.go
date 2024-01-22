@@ -120,7 +120,7 @@ func resolveAddress(s *State, line []uint8, opcode opcode) uint16 {
 		base := s.reg.getPC()
 		address, _ = addOffsetRelative(base, line[2])
 	default:
-		panic("Assert failed. Missing addressing mode")
+		panic(fmt.Sprintf("Assert failed. Missing addressing mode %d", opcode.addressMode))
 	}
 
 	if extraCycle {
@@ -134,11 +134,13 @@ func resolveAddress(s *State, line []uint8, opcode opcode) uint16 {
 Note: extra cycle on reads when crossing page boundaries.
 
 Only for:
+
 	modeAbsoluteX
 	modeAbsoluteY
 	modeIndirectIndexedY
 	modeRelative
 	modeZeroPageAndRelative
+
 That is when we add a 8 bit offset to a 16 bit base. The reason is
 that if don't have a page crossing the CPU optimizes one cycle assuming
 that the MSB addition won't change. If it does we spend this extra cycle.

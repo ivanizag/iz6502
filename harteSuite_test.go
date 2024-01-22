@@ -7,8 +7,9 @@ package iz6502
 		- Test 6502/v1/20_55_13 (Note 1)
 		- Not implemented undocumented opcodes for NMOS (Note 2)
 		- Errors on flag N for ADC in BCD mode (Note 3)
+		- Test 6502/v1/d3_f4_44 for undocumented opcode DCP (Note 4)
 
-	The tests are disabled by defaut because they take long to run
+	The tests are disabled by default because they take long to run
 	and require a huge download.
 	To enable them, clone the repo https://github.com/TomHarte/ProcessorTests
 	and change the variables ProcessorTestsEnable and ProcessorTestsPath.
@@ -21,7 +22,7 @@ import (
 	"testing"
 )
 
-var ProcessorTestsEnable = false
+var ProcessorTestsEnable = true
 var ProcessorTestsPath = "/home/casa/code/ProcessorTests/"
 
 type scenarioState struct {
@@ -59,11 +60,6 @@ func TestHarteNMOS6502(t *testing.T) {
 				s := NewNMOS6502(m)
 				testOpcode(t, s, path, opcode, mnemonic)
 			})
-			//} else {
-			//	opcode := fmt.Sprintf("%02x", i)
-			//	t.Run(opcode+mnemonic, func(t *testing.T) {
-			//		t.Error("Opcode not implemented")
-			//	})
 		}
 	}
 }
@@ -105,7 +101,9 @@ func testOpcode(t *testing.T, s *State, path string, opcode string, mnemonic str
 	}
 
 	for _, scenario := range scenarios {
-		if scenario.Name != "20 55 13" { // Note 1
+		if scenario.Name != "20 55 13" && // Note 1
+			scenario.Name != "d3 f4 44" { // Note 4
+
 			t.Run(scenario.Name, func(t *testing.T) {
 				testScenario(t, s, &scenario, mnemonic)
 			})
