@@ -483,3 +483,18 @@ func TestStack(t *testing.T) {
 		t.Errorf("Error in PLP, %v", s.reg)
 	}
 }
+
+func testDisasmLine(t *testing.T, line []uint8, expected string) {
+	s := NewNMOS6502(new(FlatMemory))
+
+	text := s.disasmLine(line)
+	if text != expected {
+		t.Errorf("Error in disasm for '%s' got '%s'", expected, text)
+	}
+}
+
+func TestDisam(t *testing.T) {
+	testDisasmLine(t, []uint8{0xA9, 0x42}, "LDA #$42")
+	testDisasmLine(t, []uint8{0x00}, "BRK")
+	testDisasmLine(t, []uint8{0x2C, 0x40, 0x12}, "BIT $1240")
+}

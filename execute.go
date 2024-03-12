@@ -111,6 +111,36 @@ func (s *State) ExecuteInstruction() {
 	}
 }
 
+func (s *State) disasmLine(line []uint8) string {
+	op := s.opcodes[line[0]]
+	if op.cycles == 0 {
+		// Unknown opcode
+		op = opcode{"???", 1, 1, modeImplicit, opNOP}
+	}
+
+	return lineString(line, op)
+
+}
+
+// DisasmInstruction disassembles the instruction at the given address
+func (s *State) DisasmInstruction(pc uint16) (string, uint16) {
+	opID := s.mem.PeekCode(pc)
+	op := s.opcodes[opID]
+
+	len := op.bytes
+	if len == 0 {
+		// Unknown opcode
+		len = 1
+	}
+
+	line := make([]uint8, len)
+	for i := uint16(0); i < len; i++ {
+		line[i] = s.mem.PeekCode(pc + i)
+	}
+
+	return fmt.Sprintf("%#04x %-13s: %v", pc, s.disasmLine(line), line), pc + op.bytes
+}
+
 // RaiseNMI raises a non-maskable interrupt
 func (s *State) RaiseNMI() {
 	s.nmiPending = true
