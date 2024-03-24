@@ -127,6 +127,8 @@ func resolveAddress(s *State, line []uint8, opcode opcode) uint16 {
 		s.extraCycleCrossingBoundaries = true
 	}
 
+	s.lastResolvedAddress = address
+
 	return address
 }
 

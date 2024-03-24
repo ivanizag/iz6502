@@ -31,6 +31,8 @@ type State struct {
 	lineCache                    []uint8
 	// We cache the allocation of a line to avoid a malloc per instruction. To be used only
 	// by ExecuteInstruction(). 2x speedup on the emulation!!
+
+	lastResolvedAddress uint16
 }
 
 const (
@@ -85,9 +87,9 @@ func (s *State) ExecuteInstruction() {
 	}
 	s.reg.setPC(pc)
 
+	var trace string
 	if s.trace {
-		//fmt.Printf("%#04x %#02x\n", pc-opcode.bytes, opcodeID)
-		fmt.Printf("%#04x %-13s: ", pc-opcode.bytes, lineString(s.lineCache, opcode))
+		trace = fmt.Sprintf("%#04x %-13s:", pc-opcode.bytes, lineString(s.lineCache, opcode))
 	}
 	opcode.action(s, s.lineCache, opcode)
 	s.cycles += uint64(opcode.cycles)
@@ -107,7 +109,7 @@ func (s *State) ExecuteInstruction() {
 	}
 
 	if s.trace {
-		fmt.Printf("%v, [%02x]\n", s.reg, s.lineCache[0:opcode.bytes])
+		fmt.Printf("%s %v, R: 0x%04x, [%02x]\n", trace, s.reg, s.lastResolvedAddress, s.lineCache[0:opcode.bytes])
 	}
 }
 
