@@ -11,7 +11,7 @@ package iz6502
 
 	The tests are disabled by default because they take long to run
 	and require a huge download.
-	To enable them, clone the repo https://github.com/TomHarte/ProcessorTests
+	To enable them, clone the repo https://github.com/SingleStepTests/65x02
 	and change the variables ProcessorTestsEnable and ProcessorTestsPath.
 */
 
