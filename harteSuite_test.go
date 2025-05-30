@@ -18,12 +18,12 @@ package iz6502
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"testing"
 )
 
 var ProcessorTestsEnable = false
-var ProcessorTestsPath = "/home/casa/code/ProcessorTests/"
+var ProcessorTestsPath = "../65x02-tests/"
 
 type scenarioState struct {
 	Pc  uint16
@@ -35,11 +35,17 @@ type scenarioState struct {
 	Ram [][]uint16
 }
 
+type cycleEntry struct {
+	Address   uint16
+	Value     uint8
+	Operation string
+}
+
 type scenario struct {
 	Name    string
 	Initial scenarioState
 	Final   scenarioState
-	Cycles  [][]interface{}
+	Cycles  []cycleEntry
 }
 
 func TestHarteNMOS6502(t *testing.T) {
@@ -85,7 +91,7 @@ func TestHarteCMOS65c02(t *testing.T) {
 }
 
 func testOpcode(t *testing.T, s *State, path string, opcode string, mnemonic string) {
-	data, err := ioutil.ReadFile(path + opcode + ".json")
+	data, err := os.ReadFile(path + opcode + ".json")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -163,4 +169,57 @@ func assertFlags(t *testing.T, sc *scenario, initial uint8, actual uint8, wanted
 	if actual != wanted {
 		t.Errorf("%08b flag diffs, they are %08b and should be %08b, initial %08b for %+v", actual^wanted, actual, wanted, initial, sc)
 	}
+}
+
+func (c cycleEntry) String() string {
+	if c.Operation == "read" {
+		return fmt.Sprintf("[$%04X]->$%02X", c.Address, c.Value)
+	} else if c.Operation == "write" {
+		return fmt.Sprintf("[$%04X]<-$%02X", c.Address, c.Value)
+	} else {
+		return fmt.Sprintf("[$%04X](%s)$%02X ", c.Address, c.Operation, c.Value)
+	}
+}
+
+func (s scenario) String() string {
+	result := fmt.Sprintf("Name: %s\nInitial: %s\nFinal: %s\nCycles: ", s.Name, s.Initial.String(), s.Final.String())
+	for _, c := range s.Cycles {
+		result += fmt.Sprintf("%s ", c.String())
+	}
+	return result
+}
+
+func (s scenarioState) String() string {
+	result := fmt.Sprintf("PC: $%04X, S: $%02X, A: $%02X, X: $%02X, Y: $%02X, P: $%02X, ", s.Pc, s.S, s.A, s.X, s.Y, s.P)
+	result += "RAM:"
+	for _, e := range s.Ram {
+		if len(e) == 2 {
+			result += fmt.Sprintf("  [$%04X]=$%02X", e[0], e[1])
+		}
+	}
+	return result
+}
+
+func (s *scenario) UnmarshalJSON(data []byte) error {
+	type Alias scenario
+	aux := &struct {
+		Cycles [][]interface{} `json:"cycles"`
+		*Alias
+	}{
+		Alias: (*Alias)(s),
+	}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+	s.Cycles = make([]cycleEntry, len(aux.Cycles))
+	for i, c := range aux.Cycles {
+		if len(c) != 3 {
+			return fmt.Errorf("cycle entry does not have 3 elements: %v", c)
+		}
+		addr, _ := c[0].(float64)
+		val, _ := c[1].(float64)
+		op, _ := c[2].(string)
+		s.Cycles[i] = cycleEntry{Address: uint16(addr), Value: uint8(val), Operation: op}
+	}
+	return nil
 }

@@ -209,7 +209,7 @@ func (s *State) Save(w io.Writer) error {
 	if err != nil {
 		return err
 	}
-	binary.Write(w, binary.BigEndian, s.reg.data)
+	err = binary.Write(w, binary.BigEndian, s.reg.data)
 	if err != nil {
 		return err
 	}

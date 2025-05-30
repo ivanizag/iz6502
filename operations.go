@@ -92,6 +92,7 @@ func buildOpBranchOnBit(bit uint8, test bool) opFunc {
 		bitValue := ((value >> bit) & 1) == 1
 
 		if bitValue == test {
+			s.extraCycleBranchTaken = true
 			address := resolveAddress(s, line, opcode)
 			s.reg.setPC(address)
 		}
@@ -207,7 +208,7 @@ func opADCAlt(s *State, line []uint8, opcode opcode) {
 	s.reg.updateFlagZN(s.reg.getA())
 }
 
-func opSBC(s *State, line []uint8, opcode opcode) {
+func opSBCBase(s *State, line []uint8, opcode opcode, alt bool) {
 	value := resolveValue(s, line, opcode)
 	aValue := s.reg.getA()
 	carry := s.reg.getFlagBit(flagC)
@@ -223,12 +224,15 @@ func opSBC(s *State, line []uint8, opcode opcode) {
 			totalBcdLo += 10
 			totalBcdHi--
 		}
+		if !alt {
+			totalBcdLo = totalBcdLo & 0xf
+		}
 		newCarry := true
 		if totalBcdHi < 0 {
 			totalBcdHi += 10
 			newCarry = false
 		}
-		totalBcd := uint8(totalBcdHi)<<4 + (uint8(totalBcdLo) & 0xf)
+		totalBcd := uint8(totalBcdHi)<<4 + uint8(totalBcdLo)
 		s.reg.setA(uint8(totalBcd))
 		s.reg.updateFlag(flagC, newCarry)
 	} else {
@@ -241,12 +245,16 @@ func opSBC(s *State, line []uint8, opcode opcode) {
 	s.reg.updateFlag(flagV, signedTotal < -128 || signedTotal > 127)
 }
 
+func opSBC(s *State, line []uint8, opcode opcode) {
+	opSBCBase(s, line, opcode, false)
+}
+
 func opSBCAlt(s *State, line []uint8, opcode opcode) {
-	opSBC(s, line, opcode)
+	opSBCBase(s, line, opcode, true)
 	if s.reg.getFlag(flagD) {
 		s.extraCycleBCD = true
 	}
-	// The Z and N flags on BCD are fixed in 65c02.
+	// The Z and N flags on BCD beheavior was fixed in 65c02.
 	s.reg.updateFlagZN(s.reg.getA())
 }
 
@@ -302,10 +310,12 @@ func opJMP(s *State, line []uint8, opcode opcode) {
 	s.reg.setPC(address)
 }
 
-func opNOP(s *State, line []uint8, opcode opcode) {}
+func opNOP(s *State, line []uint8, opcode opcode) {
+	resolveValue(s, line, opcode) // We want to do the work to know if there are extra cycles
+}
 
-func opHALT(s *State, line []uint8, opcode opcode) {
-	s.reg.setPC(s.reg.getPC() - 1)
+func opKIL(s *State, line []uint8, opcode opcode) {
+	// Should stop the CPU
 }
 
 func opJSR(s *State, line []uint8, opcode opcode) {

@@ -76,6 +76,8 @@ func resolveAddress(s *State, line []uint8, opcode opcode) uint16 {
 	extraCycle := false
 
 	switch opcode.addressMode {
+	case modeImplicit:
+		address = 0x0000 // Implicit addressing mode does not use an address
 	case modeZeroPage:
 		address = uint16(line[1])
 	case modeZeroPageX:
@@ -118,7 +120,7 @@ func resolveAddress(s *State, line []uint8, opcode opcode) uint16 {
 		// Two addressing modes combined. We refer to the second one, relative,
 		// placed one byte after the zeropage reference
 		base := s.reg.getPC()
-		address, _ = addOffsetRelative(base, line[2])
+		address, extraCycle = addOffsetRelative(base, line[2])
 	default:
 		panic(fmt.Sprintf("Assert failed. Missing addressing mode %d", opcode.addressMode))
 	}
