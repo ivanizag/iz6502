@@ -17,13 +17,15 @@ const (
 
 // State represents the state of the simulated device
 type State struct {
-	opcodes *[256]opcode
-	trace   bool
+	opcodes                *[256]opcode
+	clearDFlagOnInterrupts bool
+	trace                  bool
 
 	reg        registers
 	mem        Memory
 	cycles     uint64
 	nmiPending bool
+	irqLine    bool
 
 	extraCycleCrossingBoundaries bool
 	extraCycleBranchTaken        bool
@@ -62,12 +64,10 @@ func (s *State) executeLine(line []uint8) {
 // ExecuteInstruction transforms the state given after a single instruction is executed.
 func (s *State) ExecuteInstruction() {
 	if s.nmiPending {
-		pushWord(s, s.reg.getPC())
-		pushByte(s, s.reg.getP())
-		s.reg.setFlag(flagI)
-		s.reg.setPC(getWord(s.mem, vectorNMI))
-		s.cycles += 7
+		s.interrupt(vectorNMI)
 		s.nmiPending = false
+	} else if s.irqLine && !s.reg.getFlag(flagI) {
+		s.interrupt(vectorBreak)
 	}
 
 	pc := s.reg.getPC()
@@ -146,6 +146,27 @@ func (s *State) DisasmInstruction(pc uint16) (string, uint16) {
 // RaiseNMI raises a non-maskable interrupt
 func (s *State) RaiseNMI() {
 	s.nmiPending = true
+}
+
+// SetIRQ sets the level of the maskable interrupt request line. While it is
+// asserted, an interrupt is serviced before each instruction if the I flag
+// is clear.
+func (s *State) SetIRQ(asserted bool) {
+	s.irqLine = asserted
+}
+
+// interrupt jumps to the handler of the given vector, pushing PC and P on
+// the stack. Hardware interrupts push P with the B flag clear.
+func (s *State) interrupt(vector uint16) {
+	pushWord(s, s.reg.getPC())
+	pushByte(s, (s.reg.getP()|flag5)&^flagB)
+	s.reg.setFlag(flagI)
+	if s.clearDFlagOnInterrupts {
+		// The 65c02 clears the D flag on interrupts
+		s.reg.clearFlag(flagD)
+	}
+	s.reg.setPC(getWord(s.mem, vector))
+	s.cycles += 7
 }
 
 // Reset resets the processor. Moves the program counter to the vector in 0cfffc.

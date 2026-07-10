@@ -13,6 +13,7 @@ For the diffrences with NMOS6502 see:
 func NewCMOS65c02(m Memory) *State {
 	var s State
 	s.mem = m
+	s.clearDFlagOnInterrupts = true
 
 	var opcodes [256]opcode
 	for i := 0; i < 256; i++ {
