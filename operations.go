@@ -382,6 +382,11 @@ var opLAX = buildCombined(
 	buildOpLoad(regX), // LDX
 	true)
 
+// opSAX stores A AND X, the flags are not changed
+func opSAX(s *State, line []uint8, opcode opcode) {
+	resolveSetValue(s, line, opcode, s.reg.getA()&s.reg.getX())
+}
+
 var opRLA = buildCombined(
 	buildOpShift(true, true),   // ROL
 	buildOpLogic(operationAnd), // AND
