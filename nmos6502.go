@@ -254,6 +254,11 @@ var opcodesNMOS6502 = [256]opcode{
 	0xA3: {"LAX", 2, 6, modeIndexedIndirectX, opLAX},
 	0xB3: {"LAX", 2, 5, modeIndirectIndexedY, opLAX},
 
+	0x87: {"SAX", 2, 3, modeZeroPage, opSAX},
+	0x97: {"SAX", 2, 4, modeZeroPageY, opSAX},
+	0x8F: {"SAX", 3, 4, modeAbsolute, opSAX},
+	0x83: {"SAX", 2, 6, modeIndexedIndirectX, opSAX},
+
 	0x27: {"RLA", 2, 5, modeZeroPage, opRLA},
 	0x37: {"RLA", 2, 6, modeZeroPageX, opRLA},
 	0x2F: {"RLA", 3, 6, modeAbsolute, opRLA},
@@ -278,7 +283,7 @@ var opcodesNMOS6502 = [256]opcode{
 	0x43: {"SRE", 2, 8, modeIndexedIndirectX, opSRE},
 	0x53: {"SRE", 2, 8, modeIndirectIndexedY, opSRE},
 
-	// Missing the ALR, ANC, ANE, ARR, LAS, LXA, SAX, SBX,
+	// Missing the ALR, ANC, ANE, ARR, LAS, LXA, SBX,
 	// SHA, SHX, SHY, TAS and USBC opcodes
 
 }
